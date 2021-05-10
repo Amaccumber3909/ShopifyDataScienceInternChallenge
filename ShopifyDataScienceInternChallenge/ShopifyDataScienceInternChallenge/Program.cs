@@ -37,9 +37,6 @@ namespace ShopifyDataScienceInternChallenge
             int indexTotalItems = 4;
             int totalItemsOutlierAmount = 10;
 
-            // variables to hold the data
-            List<string[]> dataFields = null;
-
             // Variables to hold the two sum values
             float orderAmountWithOutliers = 0;
             float orderAmountNoOutliers = 0;
@@ -48,9 +45,17 @@ namespace ShopifyDataScienceInternChallenge
             int totalItemsWithOutliers = 0;
             int totalItemsNoOutliers = 0;
 
+            int totalOrders = 0;
+            int totalOrdersNoOutliers = 0;
+
+            float averageItemValue = 0;
+
             // Contains the averages
             float aovWithOutliers = 0;
             float aovNoOutliers = 0;
+
+            float averageItemsPerOrderWithOutliers = 0;
+            float averageItemsPerOrderNoOutliers = 0;
 
             // Get the data from the file and process it to calculate the AOVs
             string[] data = null;
@@ -73,42 +78,59 @@ namespace ShopifyDataScienceInternChallenge
                         if (int.Parse(data[indexTotalItems]) < totalItemsOutlierAmount)
                         {
                             // total_items amount is not considered an outlier order
-                            orderAmountNoOutliers += int.Parse(data[indexTotalItems]);
+                            totalItemsNoOutliers += int.Parse(data[indexTotalItems]);
                             orderAmountNoOutliers += int.Parse(data[indexOrderAmount]);
-                            totalItemsNoOutliers++;
+                            totalOrdersNoOutliers++;
                         }
 
                         // Add the values for the outlier calculations
-                        orderAmountWithOutliers += int.Parse(data[indexTotalItems]);
+                        totalItemsWithOutliers += int.Parse(data[indexTotalItems]);
                         orderAmountWithOutliers += int.Parse(data[indexOrderAmount]);
-                        totalItemsWithOutliers++;
+                        totalOrders++;
                     }
                 }
             }
 
             // Now calculate the AOVs
 
+            aovWithOutliers = CalculateAverage(orderAmountWithOutliers, totalOrders);
+            averageItemsPerOrderWithOutliers = CalculateAverage(totalItemsWithOutliers, totalOrders);
+            averageItemValue = CalculateAverage(aovWithOutliers, averageItemsPerOrderWithOutliers);
 
             Console.WriteLine("AOV with Outlier Data");
-            aovWithOutliers = CalculateAverage(orderAmountWithOutliers, totalItemsWithOutliers);
             Console.WriteLine("AOV: $" + aovWithOutliers.ToString("0.00"));
+            Console.WriteLine("Avg Items per Order: $" + averageItemsPerOrderWithOutliers.ToString("0.00"));
+            Console.WriteLine("Avg Item Value: $" + averageItemValue.ToString("0.00"));
 
             Console.WriteLine();
 
-            Console.WriteLine("AOV without Outlier Data (10 Items or Less)");
-            aovNoOutliers = CalculateAverage(orderAmountNoOutliers, totalItemsNoOutliers);
-            Console.WriteLine("AOV: $" + aovNoOutliers.ToString("0.00"));
+            // Calculate the values
+            aovNoOutliers = CalculateAverage(orderAmountNoOutliers, totalOrdersNoOutliers);
+            averageItemsPerOrderNoOutliers = CalculateAverage(totalItemsNoOutliers, totalOrdersNoOutliers);
+            averageItemValue = CalculateAverage(aovNoOutliers, averageItemsPerOrderNoOutliers);
 
+            // Display them to the console
+            Console.WriteLine("AOV without Outlier Data (Orders with 10 Items or Less)");
+            Console.WriteLine("AOV: $" + aovNoOutliers.ToString("0.00"));;
+            Console.WriteLine("Avg Items per Order: $" + averageItemsPerOrderNoOutliers.ToString("0.00"));
+            Console.WriteLine("Avg Item Value: $" + averageItemValue.ToString("0.00"));
+
+
+            // Prompt user to press enter to exit
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine("Press Enter To Exit");
+            Console.ReadLine();
 
         }
 
 
         // Calculate the average given the sum of the order_amounts and the sum of the total_items data fields
-        static private float CalculateAverage(float orderAmountSum, int totalItems)
+        static private float CalculateAverage(float dividend, float divisor)
         {
             float avg = 0;
 
-            avg = orderAmountSum / totalItems;
+            avg = dividend / divisor;
 
             return avg;
         }
